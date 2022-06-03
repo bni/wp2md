@@ -1,0 +1,440 @@
+                        WordPerfect File Information
+              Copyright 1984,1985,1986 WordPerfect Corporation
+                                 Version 4.2
+
+File Structure
+
+WordPerfect files are ASCII files.  The text is neither encrypted nor
+compacted.  WordPerfect files do not contain a ^Z as an end of file
+character.  If a program places a ^Z and pads to the end of the block with
+garbage, then WordPerfect may crash (padding with nulls or ^Z's is OK).
+
+Formatting or function codes are embedded as they occur in the text.  No
+code is used for beginning of file, or end of file.  When creating
+WordPerfect files from other programs, keep in mind that 1) the initial WP
+margin settings are usually 10 and 74 and it is best to keep the line length
+65 characters or less unless you change the margin settings and 2) it is
+best not to pad with spaces.
+
+Function Codes
+
+All function codes listed below are represented as base-8 (octal) numbers. 
+Angle brackets are not actually a part of the function codes.  They are
+simply used to indicate that the enclosed number is a single-byte code
+unless clearly stated otherwise.  Square brackets are similarly not part of
+the code but are simply used to clarify the notation.
+
+Where multiple byte data is indicated within angle brackets, the data is
+treated as a binary string.  Wherever an "old value" is indicated, a binary
+zero can be used.  WordPerfect will automatically take care of updating the
+"old value" locations.  On output, the "old value" can be ignored.
+
+Multiple-Byte Functions
+
+The code for multiple-byte functions (those above 300) always appears
+twice--the first occurrence is the "open gate," and a second occurrence is
+the "closing gate."  These functions present a special problem, because some
+of the functions have a variable length.  The length of each function is
+listed at the left margin.  Those functions whose length is indicated by a
+-1 have a variable length.  In the case of variable-length, multiple-byte
+function, a program should scan for the "closing gate."  For other multiple-
+byte functions, a program should simply skip over the number of bytes indi-
+cated.
+
+Additional Notes
+
+There is no beginning of field or beginning of record code in WordPerfect
+secondary merge files.  The end of field separator is a ^R followed by a
+Hard Return (Line Feed), and the end of record separator is a  followed by
+a Hard Return (Line Feed).
+
+For a spelling or grammar check, special care needs to be taken to allow for
+the various types of hyphenation function codes (251-256), and for the hard
+space (240).
+
+1     011 09   Tab
+1     012 0a   Hard new line
+1     013 0b   Soft new page
+1     014 0c   Hard new page
+1     015 0d   Soft new line
+
+1     200 80   No-op (always deleted)
+1     201 81   Turn right justification on
+1     202 82   Turn right justification off
+1     203 83   End of centered text
+1     204 84   End of aligned or flushed text
+1     205 85   Used as a temp starting pt for math calc
+1     206 86   Center page from top to bottom
+1     207 87   Begin col mode
+1     210 88   End col mode (at top of page)
+1     211 89   Tab after the right margin
+1     212 8a   Widow/orphan on
+1     213 8b   Widow/orphan off
+1     214 8c   Hard end of line & soft end of page
+1     215 8d   Footnote # (appears only inside of footnotes)
+1     216 8e   Reserved
+1     217 8f   Reserved
+1     220 90   Red line on
+1     221 91   Red line off
+1     222 92   Strike out on
+1     223 93   Strike out off
+1     224 94   Underline on
+1     225 95   Underline off
+1     226 96   Reverse video on (reserved)
+1     227 97   Reverse video off (reserved)
+1     230 98   Table of contents placeholder
+1     231 99   Overstrike
+1     232 9a   Cancel hyphenation of following word
+1     233 9b   End of generated text
+1     234 9c   Bold off
+1     235 9d   Bold on
+1     236 9e   Hyphenation off
+1     237 9f   Hyphenation on
+1     240 a0   Hard space
+1     241 a1   Do subtotal
+1     242 a2   Subtotal entry
+1     243 a3   Do total
+1     244 a4   Total entry
+1     245 a5   Do grand total
+1     246 a6   Math calculation column
+1     247 a7   Begin math mode
+1     250 a8   End math mode
+1     251 a9   Hard hyphen in line
+1     252 aa   Hard hyphen at end of line
+1     253 ab   Hard hyphen at end of page
+1     254 ac   Soft hyphen
+1     255 ad   Soft hyphen at end of line
+1     256 ae   Soft hyphen at end of page
+1     257 af   End of text cols & end of line
+1     260 b0   End of text cols & end of page
+1     261 b1   negative number (N) for math mode
+1     262 b2   italics on (not implemented in IBM PC version)
+1     263 b3   italics off (not implemented in IBM PC version)
+1     264 b4   shadow on (not implemented in IBM PC version)
+1     265 b5   shadow off (not implemented in IBM PC version)
+1     266 b6   outline on (not implemented in IBM PC version)
+1     267 b7   outline off (not implemented in IBM PC version)
+1     274 bc   Superscript
+1     275 bd   Subscript
+1     276 be   Advance 1/2 line up
+1     277 bf   Advance 1/2 line down
+
+6     300 c0   Margin reset
+          <300><old left mar><old right mar>
+               <new left mar><new right mar><300>
+4     301 c1   Spacing reset - values stored in half line values
+          <301><old spacing><new spacing><301>
+3     302 c2   Left margin release
+          <302><# of spaces to go left><302>
+5     303 c3   Center the following text
+          <303><type of center><center col #><starting col #><303>
+               -text- <203>
+          Type = 0 for centering between margins
+               = 1 for centering around current column
+5     304 c4   Align or flush right
+          <304><align char><align col #><starting col #><304> -text- <204>
+          If align char = 12 (new line) then this is a flush right and the
+               align col # is the right margin; otherwise, the align col #
+               is the next tab stop.
+          If the high bit of the align character is set, then this is dot
+               leader align or dot leader flush right.
+6     305 c5   Reset hyphenation zone (Hotzone)
+          <305><old left hzone><old right hzone>
+                <new left hzone><new right hzone><305>
+4     306 c6   Set page number position
+          <306><old pos code><new pos code><306>
+          Code:    0 = None         1 = Top Left    2 = Top Center
+                   3 = Top Right    4 = Top L & R   5 = Bottom Left
+                   6 = Bot Center   7 = Bot Right   8 = Bottom L & R
+6     307 c7   Set page number
+          <307><old # high order><old # low order>
+                <new # high order><new # low order><307>
+          Only low order 15 bits determine the page number.
+          If high bit is set, style is Roman, otherwise Arabic.
+8     310 c8   Set page # col positions
+          <310><old left><old cen><old right>
+                <new left><new cen><new right><310>
+42    311 c9   Set tabs (used in 2.2-4.1, 4.2 and later uses 361)
+          <311><old tab table (20. Bytes)><new tab table (20. Bytes)><311>
+          Each bit represents one position counting from bit 0 to bit 159
+3     312 ca   Conditional end of page
+          <312><number of single spaced lines not to be broken><312>
+6     313 cb   Set pitch and/or font
+          <313><old pitch><old font><new pitch><new font><313>
+          If pitch is negative, then it is proportional.
+4     314 cc   Set temporary margin (indent)
+          <314><old tmar><new tmar><314>
+3     315 cd   End of temporary margin (used in versions before 2.2)
+          <315><temp marg><315>
+4     316 ce   Set top margin (values are in half lines)
+          <316><old top marg><new top marg><316>
+3     317 cf   Suppress page characteristics
+          <317><supress code><317>
+          Code: (any or all bits may be inclusive or'ed together)
+             1 = all suppressed
+             2 = pg #'s suppressed
+             4 = pg # moved to bottom
+            10 = all headers suppressed
+            20 = header a suppressed
+            40 = header b suppressed
+           100 = footer a suppressed
+           200 = footer b suppressed
+6     320 d0   Set form length
+          <320><old form length><old # of text lines>
+                <new form length><new # of text lines><320>
+          Form length is stored as a number of 6 lpi lines
+          Number of text lines is stored in half-lines
+-1    321 d1   Header/footer
+          <321><old def byte><# 1/2 lines used by old header/footer><377>
+                <377><lmar><rmar> -text- <377><# of 1/2 lines><def><321>
+          Type (low-order 2 bits)       Occurrence (high-order 6 bits)
+               0 = header a                 0 = never
+               1 = header b                 1 = all pages
+               2 = footer a                 2 = odd pages
+               3 = footer b                 4 = even pages
+          Note that the low-order two bits of the old def byte must be   
+correct
+-1    322 d2   Footnote (used in 2.2-3.0, 4.0 and later uses 342)
+          <322><fn #><# of half lines><377><lmar><rmar> -text- <322>
+4     323 d3   Set footnote # (used in 2.2-3.0, 4.0 and later uses 344)
+          <323><old #><new #><323>
+4     324 d4   Advance to half-line # (stored in half-line values)
+          <324><old line #><adv to 1/2 line #><324>
+4     325 d5   Set lines per inch (only 6 or 8 lpi is valid)
+          <325><old lpi code><new lpi code><325>
+6     326 d6   Set extended tabs
+          <326><old start><old increment><new start><new increment><326>
+          Starting column position must be at least 160
+-1    327 d7   Define math columns
+          <327><Old Col. Def (24 Bytes)>
+                   [<Old Calc 0>]<0>[<Old Calc 1>]<0>
+                   [<Old Calc 2>]<0>[<Old Calc 3>]<0><377>
+               <New Col. Def (24 Bytes)>
+                   [<New Calc 0>]<0>[<New Calc 1>]<0>
+                   [<New Calc 2>]<0>[<New Calc 3>]<0><327>
+4     330 d8   Set alignment character
+          <330><old char><new char><330>
+4     331 d9   Set left margin release (# of columns to go left)
+          <331><old #><new #><331> (used in 2.2-3.0, not used in 4.0)
+4     332 da   Set underline mode
+          <332><old mode><new mode><332>
+               0 = normal underlining
+               1 = double underlining
+               2 = single underlining continuous
+               3 = double continuous
+4     333 db   Set sheet feeder bin number
+          <333><old #><new #><333>
+          Number is stored as one less than the bin number
+               (bin #1 = 0, etc.)
+-1    334 dc   End of page function (WordPerfect inserts this--changes each
+               version)
+          <334><# of 1/2 lines at end of page, low 7 bits><high 7 bits>
+               <# of 1/2 lines used for footnotes>
+               <# of pages used for footnotes>
+               <# footnotes on this page><ceop flag><suppress code><334>
+          If eop for last col on page then after <suppress>
+               comes 23 more bytes:
+               <# of 1/2 lines for col 1><# of 1/2 lines for col 2>
+               <# of 1/2 lines for col 3>...<# of 1/2 lines for col 23>
+               <line # of col on (0 if none on this page)>
+24    335 dd   Define columns (used in 2.2-4.1, 4.2 and later uses 363)
+          <335><old#cols><l1><r1><l2><r2><l3><r3><l4><r4><l5><r5>
+                <new#cols><l1><r1><l2><r2><l3><r3><l4><r4><l5><r5><335>
+          # cols:  low-order 7 bits = number
+                   high-order 1 bit = 1 if parallel columns (for 4.1)
+4     336 de   End of temp marg
+          <336><old left tmar><old right tmar><336>
+-1    337 df   Invisible characters (embedded printer command)
+          <337><7-bit text><337>
+          If character is >=277, then it is represented as <277><char-277>
+4     340 e0   L/R temporary margin
+          Old format (pre 4.0):
+               <340><New right tmar><new left tmar><340>
+          New format (4.0):
+               <240><0><Difference between old and new left margin><340>
+3     341 e1   Extended character
+          <341><character><341>
+-1    342 e2   New footnote/endnote (4.0 and later)
+          <342><def><a><b><c><d><old ftnln><# ln pg 1><# ln pg 2>...
+               <# Ln pg n><# pgs><377><lmar><rmar> - text - <342>
+          Def: Bit 0: 0 = use numbers, 1 = use chars
+               Bit 1: 0 = footnote, 1 = endnote
+          a,b: If def bit 0 = 0, then a,b = footnote/endnote #
+               If def bit 0 = 1, then a = # of chars, b = char
+          c,d: Number of lines in foot/end note
+          Note:  a,b and c,d are 14 bit numbers split into 7-bit bytes, high
+                   order byte first
+          Note:  For endnotes, there is just a null between <d> & <377>
+150   343 e3   Footnote information (options) function
+          <343><old values 74 bytes><new values 74 bytes><343>
+          Byte Meaning
+           1       spacing in footnotes
+           2       spacing between footnotes
+           3       number of lines to keep together
+           4       flag byte (bits: b ln en ft n)
+                        n: 1 if numbering starts on each page
+                   en & ft:    0 = use numbers
+                           1 = use characters
+                           2 = use letters
+                       ln: 0 = no line separator
+                           1 = 2" line
+                           2 = line from left to right margin
+                           3 = 2" line & "Footnote continued" message
+                        b: 0 = footnotes after text
+                           1 = footnotes at bottom of page
+          5        # of chars used in place of ftn #'s
+          6-10 chars used in place of ftn #'s (null terminated if < 5)
+          11       # of displayable chars in string for footnote-text
+          12-26    string for footnote-text
+          27       # of displayable chars in string for endnote-text
+          28-42    string for endnote-text
+          43       # of displayable chars in string for footnote-note
+          44-58    string for footnote-note
+          59       # of displayable chars in string for endnote-note
+          60-74    string for endnote-note
+6     344 e4   New set footnote # (4.0 and later)
+          <344><old # high><old # low><new # high><new # low><344>
+          Footnote numbers are 14 bit numbers split into 7-bit bytes, high
+               order byte first
+23    345 e5   Paragraph number definition
+               (used in 2.2-4.1, 4.2 and later uses 356)
+          <345><old 7 level numbers><old 7 def bytes>
+               <new 7 def bytes><345>
+          Def byte = two nibbles:
+               Numbering style (low nibble) Punctuation (high nibble)
+               0 = caps Roman               0 = nothing
+               1 = l.c. Roman               1 = "." after number
+               2 = caps letter          2 = ")" after number
+               3 = l.c. letter          3 = "(" before, ")" after
+               4 = Arabic
+               5 = Arabic with previous levels separated by "."
+11    346 e6   Paragraph number (used in 2.2-4.1, 4.2 and later uses 357)
+          <346><new level #><def byte><old 7 numbers><346>
+          Level # is 0 for first level, 1 for 2nd, etc.
+3     347 e7   Begin marked text
+          <347><def,info><347> - text - <350><def,info><350>
+               Definition (high nibble)     Information (low nibble)
+               0 = table of contents        level (0-4)
+               2 = list                     list # (0-4)
+3     350 e8   End marked text
+          <350><def,info><350>
+          Def, info same as for mark (347)
+-1    351 e9   Define marked text
+          <351><def,info><5 bytes definition><concordance file name><351>
+          Def, info byte:
+               Definition (high nibble)     Information (low nibble)
+               0 = table of contents        level (0-4)
+               1 = index                    concordance file flag
+               2 = list                     list # (0-4)
+               3 = ToA                      ToA section # (0-15)
+
+          For Index the low nibble of the def, info byte is:
+                   0 = no concordance file
+                   1 = concordance file name included in function
+          For ToC, 5 Definition bytes represent the five levels
+          For index and lists only first definition byte is significant
+               Definition bytes for ToC, index, and lists:
+                   0 = no page numbers
+                   1 = page # after text, preceded by two spaces
+                   2 = page # after text, in parentheses, preceded by one
+                       space
+                   3 = page # flush right
+                   4 = page # flush right with dot leader
+          For ToA, just first def byte is significant
+               Def byte=xxxBxxDU
+                   B=1 if blank line should be inserted between authorities
+                   D=1 if dot leader before page numbers
+                   U=1 if underlining allowed
+-1    352 ea   Define index mark
+          <352><index heading><0><subheading><352>
+32    353 eb   Date/Time function
+          <353><30 byte, null terminated format string><353>
+4     354 ec   Block Protect
+          <354><Def><# of 1/2 lines in block><354>
+          Def  = 0 for Block Protect On
+               = 1 for Block Protect Off
+-1    355 ed   Table of Authorities
+          <355><Section Number><0>short form<0>full form<355>
+               Section Number = 0-15 or 32
+               0 thru 15 are valid section numbers
+               a section number of 32 is used to indicate that the function
+               contains only a short form and no full form
+44    356 ee   Paragraph Number Definition (new)
+          <356><old 7 level numbers (words)><old 7 def bytes>
+               <new 7 def bytes><7 starting level #'s (words)><356>
+          each def byte = two nibbles
+          low nibble = numbering style      high nibble = punctuation    
+          ----------                    -----------
+          0 = caps roman                0 = nothing
+          1 = l.c. roman                1 = "." After number
+          2 = caps letter               2 = ")" after number
+          3 = l.c. letter               3 = "(" before, ")" after
+          4 = arabic
+          5 = arabic with previous levels separated by "."
+18    357 ef   Paragraph Number (new)
+          <357><new level #><def byte><old 7 numbers (words)><357>
+                level # is 0 for first level, 1 for 2nd, etc.
+6     360 f0   Line Numbering
+          <360><Old Interval><Old Position>
+               <New Interval><New Position><360>
+          interval = STR00000:
+               bit 7 (S) = Status (1 = line numbering on)
+               bit 6 (T) = Number only Text lines (1 = on)
+               bit 5 (R) = Restart numbering on each page (1 = on)
+               00000 = line numbering interval (0-30)
+          position =   distance from left edge of paper to right edge of
+                       line number in 10ths of an inch 
+106   361 f1   Tab Reset
+          <361><old tab table (32 bytes)><old type table (20 bytes)>
+               <new tab table (32 bytes)><new type table (20 bytes)><361>
+               Each bit in tab table represents one position counting bit 0
+                   to 250.
+                   Each nibble in type table is the type of the
+                       corresponding tab, ie. the 5th nibble is the type for
+                       the 5th bit set, up to 40 tabs, the rest are assumed
+                       type 0.
+               Types:  0 = Normal left justified tab
+                       1 = Centered tab
+                       2 = Right justified tab
+                       3 = Decimal aligned tab
+                       4 = Left justified tab with a dot leader
+                       5 = not used
+                       6 = Right justified with a dot leader
+                       7 = Decimal aligned with a dot leader
+-1    362 f2   Comment/Summary
+          <362><Def><old ufcur><# Lines><0> - Text - <362>
+          Def: Bit 0=0 if comment
+                    =1 if document summary, all text in following format:
+          Date Of Creation <HRt> Author <HRt> Typist <HRt> Comments
+100   363 f3   Define columns (length is 24*2*2+4)
+          <363><old#cols><l1><r1><l2><r2>...<l24><r24>
+                <new#cols><l1><r1><l2><r2>...<l24><r24><363>
+          # cols:  low-order 7 bits = number
+                   high-order 1 bit = 1 if parallel columns
+
+4     364 f4   Point size (not implemented in IBM PC version)
+          <364><old size><new size><364>
+          size is in points (1/72 inch)
+
+-1    365 f5   Picture
+          for Mac: 8 bytes for rectangle
+                   4 bytes for type (PICT)
+                   2 bytes for indentifier
+          perhaps also def byte to indicate whether it takes up space or
+          overlays existing text; perhaps size in half line (maybe a 0 size
+          is sufficient to indicate it overlays existing text).
+
+5     366 f6   Different display character when hyphenated
+          <366><def byte><char when inline><char when hyphenated><366>
+          bits in def byte:
+               bit 0 = 0 if no hyphenation next to function
+                     = 1 if hyphenation happens next to function
+               bit 1 = 0 if this function is after the hyphenation
+                     = 1 if this function preceeds the hyphenation
+          if a char is a null, then nothing is displayed for it.
+          examples:  papaatje = pa-pa-<366><1><"a"><0><366>tje   
+                     dineetje = di-ne<366><3><"e"><"r"><366>-tje  
+
+-1    367 f7   Leading (for Mac)
+
+-1    370 f8   Kerning Adjustment (for Mac)
